@@ -1,4 +1,4 @@
-from django.shortcuts import render
+import logging
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
-import logging
+
 import json
 
 # Get an instance of a logger
@@ -79,7 +79,7 @@ def registration_request(request):
             last_name=last_name,
         )
         login(request, user)
-        return redirect("djangoapp:index")
+    return redirect("djangoapp:index")
 
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
