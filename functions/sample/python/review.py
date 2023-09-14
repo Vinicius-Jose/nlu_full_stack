@@ -70,8 +70,8 @@ def get_specific_doc(service: CloudantV1, db: str, param_dict: dict) -> list:
 
 main(
     {
-        "api_key": "BdAvzW9H0NRivq0y0gz7zDix4WvcUyCPWiQzAzyguBYT",
-        "url": "https://ca869065-5aa7-4f02-9dc6-739f6a5ea587-bluemix.cloudantnosqldb.appdomain.cloud",
+        "api_key": "",
+        "url": "",
         "review": {
             "id": 1114,
             "name": "Upkar Lidder",
