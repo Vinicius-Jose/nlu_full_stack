@@ -5,13 +5,20 @@
     <meta charset="UTF-8">
     {% load static %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css"
+        rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
 </head>
 
-<body class="mx-sm-3 mb-2 w-50 p-3">
+<body>
+    {% include './nav_bar.html' %}
 
     <h3 class=card-title> Sign Up</h3>
     <hr>
-    <form action="{% url 'djangoapp:registration' %}" method="post">
+    <form action="{% url 'djangoapp:registration' %}" method="post" class="mx-sm-3 mb-2 w-50 p-3">
 
         <div class="form-group ">
             <label for="userName" class="font-weight-bold">User Name</label>

@@ -11,9 +11,14 @@ from datetime import datetime
 
 import json
 
+from djangoapp.restapis import get_dealers_from_cf
+from djangoapp.restapis import get_dealer_reviews_from_cf
+from djangoapp.restapis import post_request
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
+URL_REVIEW = ""
 
 # Create your views here.
 
@@ -45,9 +50,6 @@ def login_request(request):
 def logout_request(request):
     logout(request)
     return redirect("djangoapp:index")
-
-
-# ...
 
 
 # Create a `registration_request` view to handle sign up request
@@ -86,13 +88,40 @@ def registration_request(request):
 def get_dealerships(request):
     context = {}
     if request.method == "GET":
+        url = ""
+        # Get dealers from the URL
+        dealerships = get_dealers_from_cf(url)
+        # Concat all dealer's short name
+        dealer_names = " ".join([dealer.short_name for dealer in dealerships])
+        # Return a list of dealer short name
+        print(dealer_names)
+        # return HttpResponse(dealer_names)
         return render(request, "djangoapp/index.html", context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
-# ...
+def get_dealer_details(request, dealer_id):
+    context = {}
+    if request.method == "GET":
+        url = URL_REVIEW
+        reviews = get_dealer_reviews_from_cf(url, dealerId=dealer_id)
+        context = " ".join([review.review + review.sentiment for review in reviews])
+        return HttpResponse(context)
+
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
-# ...
+def add_review(request, dealer_id):
+    if not User.is_authenticated:
+        return redirect("djangoapp:registration")
+    elif request.method == "GET":
+        return render(request, "djangoapp/add_review.html", {"dealer_id": dealer_id})
+    review = {
+        "time": datetime.utcnow().isoformat(),
+        "dealership": dealer_id,
+        "review": request.POST.get("review"),
+    }
+    json_payload = {"review": review}
+    result = post_request(url=URL_REVIEW, review=json_payload, dealerId=dealer_id)
+    return HttpResponse(result)

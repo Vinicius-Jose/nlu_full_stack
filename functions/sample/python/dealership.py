@@ -20,6 +20,9 @@ def main(param_dict: dict):
 
     param_dict.pop("api_key")
     param_dict.pop("url")
+    param_dict.pop("__ow_headers")
+    param_dict.pop("__ow_path")
+    param_dict.pop("__ow_method")
     db = "dealerships"
     if param_dict:
         body = get_specific_doc(service, db, param_dict)
@@ -40,7 +43,18 @@ def get_all_docs(service: CloudantV1, db: str) -> list:
 
 
 def get_specific_doc(service: CloudantV1, db: str, param_dict: dict) -> list:
-    fields = ["id", "city", "state", "st", "address", "zip", "lat", "long"]
+    fields = [
+        "_id",
+        "_rev",
+        "id",
+        "city",
+        "state",
+        "st",
+        "address",
+        "zip",
+        "lat",
+        "long",
+    ]
     result = service.post_find(
         db=db,
         selector={"state": {"$eq": param_dict.get("state")}},
@@ -53,9 +67,7 @@ def get_specific_doc(service: CloudantV1, db: str, param_dict: dict) -> list:
 
 main(
     {
-        "api_key": "",
-        "url": "",
-        "state": "California",
-        "limit": 2,
+        "api_key": "BdAvzW9H0NRivq0y0gz7zDix4WvcUyCPWiQzAzyguBYT",
+        "url": "https://ca869065-5aa7-4f02-9dc6-739f6a5ea587-bluemix.cloudantnosqldb.appdomain.cloud",
     }
 )

@@ -20,13 +20,17 @@ def main(param_dict: dict):
 
     param_dict.pop("api_key")
     param_dict.pop("url")
+    param_dict.pop("__ow_headers")
+    param_dict.pop("__ow_path")
     db = "reviews"
-    if "review" in param_dict.keys():
+    if param_dict.get("__ow_method") == "post":
         body = post_review(service, db, param_dict.get("review"))
-    if param_dict:
-        body = get_specific_doc(service, db, param_dict)
     else:
-        body = get_all_docs(service, db)
+        param_dict.pop("__ow_method")
+        if param_dict:
+            body = get_specific_doc(service, db, param_dict)
+        else:
+            body = get_all_docs(service, db)
 
     if not body:
         return {"body": {}, "headers": {"status_code": 404}}
@@ -66,23 +70,3 @@ def get_specific_doc(service: CloudantV1, db: str, param_dict: dict) -> list:
     )
     body = result._to_dict().get("result", {}).get("docs", [])
     return body
-
-
-main(
-    {
-        "api_key": "",
-        "url": "",
-        "review": {
-            "id": 1114,
-            "name": "Upkar Lidder",
-            "dealership": 15,
-            "review": "Great service!",
-            "purchase": False,
-            "another": "field",
-            "purchase_date": "02/16/2021",
-            "car_make": "Audi",
-            "car_model": "Car",
-            "car_year": 2021,
-        },
-    }
-)
