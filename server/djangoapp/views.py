@@ -15,10 +15,18 @@ from djangoapp.restapis import get_dealers_from_cf
 from djangoapp.restapis import get_dealer_reviews_from_cf
 from djangoapp.restapis import post_request
 
+from dotenv import load_dotenv
+import os
+
+from djangoapp.models import CarModel
+
+load_dotenv()
+
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-URL_REVIEW = ""
+REVIEW_URL = os.getenv("REVIEW_URL")
+DEALERSHIP_URL = os.getenv("DEALERSHIP_URL")
 
 # Create your views here.
 
@@ -88,14 +96,11 @@ def registration_request(request):
 def get_dealerships(request):
     context = {}
     if request.method == "GET":
-        url = ""
+        url = DEALERSHIP_URL
         # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
-        # Concat all dealer's short name
-        dealer_names = " ".join([dealer.short_name for dealer in dealerships])
         # Return a list of dealer short name
-        print(dealer_names)
-        # return HttpResponse(dealer_names)
+        context["dealerships"] = dealerships
         return render(request, "djangoapp/index.html", context)
 
 
@@ -104,24 +109,42 @@ def get_dealerships(request):
 def get_dealer_details(request, dealer_id):
     context = {}
     if request.method == "GET":
-        url = URL_REVIEW
+        url = REVIEW_URL
         reviews = get_dealer_reviews_from_cf(url, dealerId=dealer_id)
-        context = " ".join([review.review + review.sentiment for review in reviews])
-        return HttpResponse(context)
+        context["reviews"] = reviews
+        context["dealer_id"] = dealer_id
+        return render(request, "djangoapp/dealer_details.html", context)
 
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 def add_review(request, dealer_id):
+    context = {}
     if not User.is_authenticated:
         return redirect("djangoapp:registration")
     elif request.method == "GET":
-        return render(request, "djangoapp/add_review.html", {"dealer_id": dealer_id})
+        cars = CarModel.objects.filter(dealer_id=dealer_id)
+        dealer = get_dealers_from_cf(DEALERSHIP_URL, dealerId=dealer_id)
+        context["dealer_id"] = dealer_id
+        context["cars"] = cars
+        context["dealer"] = dealer[0]
+        return render(request, "djangoapp/add_review.html", context)
+    selected_car = request.POST.get("car")
+    selected_car: CarModel = CarModel.objects.get(id=selected_car)
+
     review = {
         "time": datetime.utcnow().isoformat(),
         "dealership": dealer_id,
         "review": request.POST.get("review"),
+        "car_make": selected_car.car_make.name,
+        "car_model": selected_car.car_type,
+        "car_year": selected_car.year.strftime("%Y"),
+        "name": selected_car.name,
+        "purchase": request.POST.get("purchasecheck"),
+        "purchase_date": request.POST.get("purchasedate"),
     }
+
     json_payload = {"review": review}
-    result = post_request(url=URL_REVIEW, review=json_payload, dealerId=dealer_id)
-    return HttpResponse(result)
+    print(json_payload)
+    result = post_request(url=REVIEW_URL, review=review, dealerId=dealer_id)
+    return redirect("djangoapp:dealer_details", dealer_id=dealer_id)

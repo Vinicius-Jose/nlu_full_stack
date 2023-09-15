@@ -55,9 +55,14 @@ def get_specific_doc(service: CloudantV1, db: str, param_dict: dict) -> list:
         "lat",
         "long",
     ]
+    selector = (
+        {"id": {"$eq": int(param_dict.get("dealerId", 0))}}
+        if param_dict.get("dealerId", 0)
+        else {"state": {"$eq": param_dict.get("state")}}
+    )
     result = service.post_find(
         db=db,
-        selector={"state": {"$eq": param_dict.get("state")}},
+        selector=selector,
         fields=fields,
         limit=param_dict.get("limit", 5),
     )

@@ -15,6 +15,7 @@ ibm-cloud-sdk-core = "3.10.0"
 ibm-watson = "5.2.2"
 ibmcloudant = "0.0.34"
 pillow = "^10.0.0"
+python-dotenv = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
