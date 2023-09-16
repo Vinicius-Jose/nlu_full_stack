@@ -11,8 +11,6 @@ ENV APP=/app
 # Change the workdir.
 WORKDIR $APP
 
-# Install the requirements
-COPY requirements.txt $APP
 
 RUN pip3 install poetry && poetry install
 
